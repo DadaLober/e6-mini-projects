@@ -1,16 +1,35 @@
-const BASE_URL = "https://api.breakingbadquotes.xyz/v1/quotes";
+const BASE_URL = "https://api.breakingbadquotes.xyz/v1/quotes/5";
+const quoteElement = document.getElementById("quote");
+const buttonElement = document.getElementById("button");
 
-const getQuote = async () => {
+let data = [];
+let isFetching = false;
+
+const fetchData = async () => {
+  if (isFetching) return;
+  isFetching = true;
   try {
     const response = await fetch(BASE_URL);
-    const data = await response.json();
-    const quote = data[0];
-    const quoteElement = document.getElementById("quote");
-    quoteElement.innerHTML = `"${quote.quote}" - <i>${quote.author}</i>`;
+    const newData = await response.json();
+    data.push(...newData);
   } catch (error) {
     console.error(error);
+  } finally {
+    isFetching = false;
   }
 };
 
-const button = document.getElementById("button");
-button.addEventListener("click", getQuote);
+const displayQuote = async () => {
+  if (data.length === 0) {
+    await fetchData();
+  }
+  console.log(data);
+  const nextQuote = data.shift();
+  quoteElement.innerHTML = `"${nextQuote.quote}" - ${nextQuote.author}`;
+  if (data.length === 0) {
+    await fetchData();
+  }
+};
+
+buttonElement.addEventListener("click", displayQuote);
+fetchData();
