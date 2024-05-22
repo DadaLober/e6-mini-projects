@@ -3,28 +3,20 @@ const quoteElement = document.getElementById("quote");
 const buttonElement = document.getElementById("button");
 
 let data = [];
-let isFetching = false;
 
 const fetchData = async () => {
-  if (isFetching) return;
-  isFetching = true;
   try {
     const response = await fetch(BASE_URL);
     const newData = await response.json();
     data.push(...newData);
   } catch (error) {
     console.error(error);
-  } finally {
-    isFetching = false;
   }
 };
 
 const displayQuote = async () => {
-  if (data.length === 0) {
-    await fetchData();
-  }
-  console.log(data);
   const nextQuote = data.shift();
+  console.log(data);
   quoteElement.innerHTML = `"${nextQuote.quote}" - ${nextQuote.author}`;
   if (data.length === 0) {
     await fetchData();
